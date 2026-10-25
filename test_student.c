@@ -1,7 +1,7 @@
 /*
  * test_student.c -- CS 313 P2: your three hand-traced tests.
  *
- * Name:
+ * Name: Hadi Almarzooq
  *
  * Write three tests. Each one builds a heap, then checks the heap array
  * with CHECK_HEAP(h, k0, k1, ...), where the keys are an array YOU worked
@@ -40,20 +40,54 @@
 
 void student_test_1(void) {
     Heap *h = heap_create(20);
-    /* TODO */
-    heap_destroy(h);
+
+    /* Trace:
+       Insert 1: [1]
+       Insert 2: [2, 1]
+       Insert 3: [3, 1, 2]
+       Insert 4: [4, 3, 2, 1]
+       Insert 5: [5, 4, 2, 1, 3]
+       Insert 6: [6, 4, 5, 1, 3, 2]
+       Insert 7: [7, 4, 6, 1, 3, 2, 5]*/
+
+    heap_insert(h, 1);
+    heap_insert(h, 2);
+    heap_insert(h, 3);
+    heap_insert(h, 4);
+    heap_insert(h, 5);
+    heap_insert(h, 6);
+    heap_insert(h, 7);    heap_destroy(h);
 }
 
 void student_test_2(void) {
     /* TODO: replace these keys with your own. */
-    int a[] = {0};
-    Heap *h = heap_build(a, 0, 20);
+    int a[] = {1, 2, 3, 4, 5, 6, 7};
+    Heap *h = heap_build(a, 7, 20);
     /* TODO */
+    CHECK_HEAP(h, 7, 5, 6, 4, 2, 1, 3);
+
     heap_destroy(h);
 }
 
 void student_test_3(void) {
-    Heap *h = heap_create(20);
-    /* TODO */
+
+    /* Trace extract_max twice on built heap [7, 5, 6, 4, 2, 1, 3]:
+       Extract 1: root 7 removed, 3 moves to root -> [3, 5, 6, 4, 2, 1]
+                  sift 3 down: swap with 6 -> [6, 5, 3, 4, 2, 1]
+       Extract 2: root 6 removed, 1 moves to root -> [1, 5, 3, 4, 2]
+                  sift 1 down: swap with 5 -> [5, 1, 3, 4, 2]
+                               swap with 4 -> [5, 4, 3, 1, 2]
+                               
+                               Used Gemini to help generating test cases.
+    */
+    int a[] = {1, 2, 3, 4, 5, 6, 7};
+    Heap *h = heap_build(a, 7, 20);
+    int out;
+
+    heap_extract_max(h, &out);
+    heap_extract_max(h, &out);
+
+    CHECK_HEAP(h, 5, 4, 3, 1, 2);
+    
     heap_destroy(h);
 }

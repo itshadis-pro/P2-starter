@@ -40,32 +40,40 @@ HELPER bool greater(int x, int y, long *comparisons) {
  * Pass &h->comparisons as the last argument from the heap functions,
  * and NULL from heap_sort. */
 
-/* Move a[i] up while it is strictly greater than its parent. */
-HELPER void sift_up(int *a, int i, long *comparisons) {
-    /* TODO */
-    (void)a;
-    (void)i;
-    (void)comparisons;
+/* Move a[i] up while it is strictly greater than its parent. */HELPER void sift_up(int *a, int i, long *comparisons) {
+    while (i > 0 && greater(a[i], a[parent(i)], comparisons)) {
+        swap(a, i, parent(i));
+        i = parent(i);
+    }
 }
 
-/* a[0 .. n-1] is the heap. Move a[i] down: find the largest of a[i] and
- * its children that exist (index < n), using strict > (left first, then
- * right). If that is a child, swap and continue from the child. */
 HELPER void sift_down(int *a, int n, int i, long *comparisons) {
-    /* TODO */
-    (void)a;
-    (void)n;
-    (void)i;
-    (void)comparisons;
+    while (left(i) < n) {
+        int l = left(i);
+        int r = right(i);
+        int largest = i;
+
+        if (greater(a[l], a[largest], comparisons)) {
+            largest = l;
+        }
+        
+        if (r < n && greater(a[r], a[largest], comparisons)) {
+            largest = r;
+        }
+
+        if (largest != i) {
+            swap(a, i, largest);
+            i = largest;
+        } else {
+            break;
+        }
+    }
 }
 
-/* Rearrange a[0 .. n-1] into a max-heap: sift down each index from
- * n/2 - 1 down to 0 (BUILD-MAX-HEAP). */
 HELPER void build(int *a, int n, long *comparisons) {
-    /* TODO */
-    (void)a;
-    (void)n;
-    (void)comparisons;
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        sift_down(a, n, i, comparisons);
+    }
 }
 /* ---- Public functions (see heap.h) ------------------------------------ */
 
@@ -81,8 +89,8 @@ Heap *heap_create(int capacity) {
     }
 
     // 2. Allocate the data array for 'capacity' integers
-    h->data = malloc(data* sizeof(capacity));
-    
+    h->data = malloc(capacity * sizeof(int));   
+
     if (h->data == NULL) {
         // Free the struct we successfully allocated above
         free(h); 
@@ -106,47 +114,62 @@ void heap_destroy(Heap *h) {
 }
 
 bool heap_insert(Heap *h, int key) {
-    /* TODO: return false if full. Otherwise store key at data[size],
-     * grow size, sift the new key up, and return true. */
-    (void)h;
-    (void)key;
-    return false;
+    if (h->size == h->capacity) {
+        return false;
+    }
+    h->data[h->size] = key;
+    h->size = h->size + 1;
+    sift_up(h->data, h->size - 1, &h->comparisons);
+    return true;
 }
 
 bool heap_peek(const Heap *h, int *out) {
-    /* TODO */
-    (void)h;
-    (void)out;
-    return false;
+    if (h->size == 0) {
+        return false;
+    }
+    *out = h->data[0];
+    return true;
 }
 
 bool heap_extract_max(Heap *h, int *out) {
-    /* TODO: return false if empty. Otherwise save the root in *out,
-     * move the LAST key to the root, shrink size, sift the root down
-     * within the new size, and return true. */
-    (void)h;
-    (void)out;
-    return false;
+    if (h->size == 0) {
+        return false;
+    }
+    *out = h->data[0];
+    h->data[0] = h->data[h->size - 1];
+    h->size = h->size - 1;
+    sift_down(h->data, h->size, 0, &h->comparisons);
+    return true;
 }
 
 Heap *heap_build(const int *a, int n, int capacity) {
-    /* TODO: check the arguments, create a heap, copy a into data,
-     * set size, then build. */
-    (void)a;
-    (void)n;
-    (void)capacity;
-    return NULL;
+    if (capacity < 1 || n < 0 || n > capacity || (n > 0 && a == NULL)) {
+        return NULL;
+    }
+    Heap *h = heap_create(capacity);
+    if (h == NULL) {
+        return NULL;
+    }
+    for (int i = 0; i < n; i++) {
+        h->data[i] = a[i];
+    }
+    h->size = n;
+    build(h->data, h->size, &h->comparisons);
+    return h;
 }
 
 void heap_sort(int *a, int n) {
-    /* TODO: build a max-heap in a. Then for end = n-1 down to 1: swap
-     * a[0] and a[end], and sift a[0] down within a[0 .. end-1]. */
-    (void)a;
-    (void)n;
+    if (a == NULL || n <= 1) {
+        return;
+    }
+    build(a, n, NULL);
+    for (int end = n - 1; end > 0; end--) {
+        swap(a, 0, end);
+        sift_down(a, end, 0, NULL);
+    }
 }
 
 int heap_size(const Heap *h) {
-    /* TODO */
     if (h == NULL){
         return 0;
     }
@@ -169,10 +192,12 @@ int heap_to_array(const Heap *h, int *out) {
 }
 
 long heap_comparisons(const Heap *h) {
-    /* TODO */
-    (void)h;
-    return -1;
+    if (h == NULL){
+        return 0;
+    }
+    return h->comparisons;
 }
+
 
 /* ---- Debug printing (provided) ---------------------------------------- */
 
