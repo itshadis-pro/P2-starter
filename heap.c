@@ -1,7 +1,7 @@
 /*
  * heap.c -- CS 313 P2: a binary max-heap of ints.
  *
- * Name:
+ * Name:Hadi Almarzooq
  *
  * Fill in every TODO. The rules are in heap.h and README.md.
  * This skeleton compiles, but it fails the tests until you finish it.
