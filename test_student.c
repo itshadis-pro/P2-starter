@@ -56,7 +56,9 @@ void student_test_1(void) {
     heap_insert(h, 4);
     heap_insert(h, 5);
     heap_insert(h, 6);
-    heap_insert(h, 7);    heap_destroy(h);
+    heap_insert(h, 7);
+    CHECK_HEAP(h, 7,4,6,1,3,2,5);  
+    heap_destroy(h);
 }
 
 void student_test_2(void) {
